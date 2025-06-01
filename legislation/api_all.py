@@ -2,14 +2,14 @@
 
 import requests
 import math
-from .models import Bill
+from .models import ALL
 
 api_key = "927928bf24af47d4afa7b805ed0bf4fc"
 api_url = "https://open.assembly.go.kr/portal/openapi/nxjuyqnxadtotdrbw"
 p_size = 1000
 age = "22"
 
-def fetch_and_save_bills():
+def fetch_and_save_all():
     params = {
         "KEY": api_key,
         "Type": "json",
@@ -34,13 +34,14 @@ def fetch_and_save_bills():
         rows = data[api_url.split("/")[-1]][1].get("row", [])
 
         for row in rows:
-            Bill.objects.update_or_create(
+            ALL.objects.update_or_create(
                 BILL_ID=row.get("BILL_ID", ""),
                 defaults={
                     "AGE": row.get("AGE", ""),
                     "PROC_RESULT_CD": row.get("PROC_RESULT_CD", ""),
                     "PROPOSER": row.get("PROPOSER", ""),
                     "DETAIL_LINK": row.get("LINK_URL", ""),
+                    "rgs_proc_dt":row.get("PROC_DT","")
                 }
             )
 
