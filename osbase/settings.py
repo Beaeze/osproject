@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'legislation.apps.LegislationConfig',
     'attendance.apps.AttendanceConfig',
     'vote.apps.VoteConfig',
+    'performance.apps.PerformanceConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
