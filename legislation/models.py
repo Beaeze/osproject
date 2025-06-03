@@ -85,9 +85,9 @@ class Law(models.Model):
     BILL_ID = models.CharField(max_length=100, unique=True)
     BILL_NO = models.CharField(max_length=50, blank=True)
     BILL_NM = models.TextField(blank=True)
-    proposer = models.CharField(max_length=100, blank=True)
+    PROPOSER = models.CharField(max_length=100, blank=True)
     PROC_RESULT_CD = models.CharField(max_length=50, blank=True)
-    announce_dt = models.CharField(max_length=20, null=True, blank=True)
+    ANNOUNCE_DT = models.CharField(max_length=20, null=True, blank=True)
     DETAIL_LINK = models.URLField(blank=True)
     RGS_PROC_DT = models.CharField(max_length=20, null=True, blank=True)  # 의결일
 

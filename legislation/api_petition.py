@@ -44,24 +44,24 @@ def fetch_and_store_petitions():
             break
 
         for row in rows:
-            bill_id = row.get("BILL_ID", "")
-            bill_no = row.get("BILL_NO", "")
-            bill_name = row.get("BILL_NAME", "")
-            proposer = row.get("PROPOSER", "")
-            proc_result_cd = row.get("PROC_RESULT_CD", "")
-            detail_link = row.get("LINK_URL", "")  # 의안 링크 추가
-            propose_dt = row.get("PROPOSE_DT", "")  # 청원 접수 일자 추가
+            BILL_ID = row.get("BILL_ID", "")
+            BILL_NO = row.get("BILL_NO", "")
+            BILL_NAME = row.get("BILL_NAME", "")
+            PROPOSER = row.get("PROPOSER", "")
+            PROC_RESULT_CD = row.get("PROC_RESULT_CD", "")
+            DETAIL_LINK = row.get("LINK_URL", "")  # 의안 링크 추가
+            PROPOSE_DT = row.get("PROPOSE_DT", "")  # 청원 접수 일자 추가
 
             # Django DB에 저장 (업데이트 or 추가)
             Petition.objects.update_or_create(
-                BILL_ID=bill_id,
+                BILL_ID=BILL_ID,
                 defaults={
-                    "BILL_NO": bill_no,
-                    "BILL_NAME": bill_name,
-                    "PROPOSER": proposer,
-                    "PROC_RESULT_CD": proc_result_cd,
-                    "DETAIL_LINK": detail_link,  # 의안 링크 반영
-                    "PROPOSE_DT": propose_dt,  # 청원 접수 일자 반영
+                    "BILL_NO": BILL_NO,
+                    "BILL_NAME": BILL_NAME,
+                    "PROPOSER": PROPOSER,
+                    "PROC_RESULT_CD": PROC_RESULT_CD,
+                    "DETAIL_LINK": DETAIL_LINK,  # 의안 링크 반영
+                    "PROPOSE_DT": PROPOSE_DT,  # 청원 접수 일자 반영
                 }
             )
 

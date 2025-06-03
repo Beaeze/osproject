@@ -41,7 +41,7 @@ def fetch_and_save_all():
                     "PROC_RESULT_CD": row.get("PROC_RESULT_CD", ""),
                     "PROPOSER": row.get("PROPOSER", ""),
                     "DETAIL_LINK": row.get("LINK_URL", ""),
-                    "rgs_proc_dt":row.get("PROC_DT","")
+                    "RGS_PROC_DT":row.get("PROC_DT","")
                 }
             )
 

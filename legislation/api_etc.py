@@ -54,23 +54,23 @@ def fetch_and_save_etc():
         # 최신 데이터 기준으로 업데이트
         for row in all_data:
             try:
-                bill_id = row.get("BILL_ID", "")
-                proc_result_cd = row.get("PROC_RESULT_CD", "")
-                link_url = row.get("LINK_URL", "")  # 의안 링크 저장
-                rgs_proc_dt = row.get("RGS_PROC_DT", "")  # 의결일자 저장
+                BILL_ID = row.get("BILL_ID", "")
+                PROC_RESULT_CD = row.get("PROC_RESULT_CD", "")
+                LINK_URL = row.get("LINK_URL", "")  # 의안 링크 저장
+                RGS_PROC_DT = row.get("RGS_PROC_DT", "")  # 의결일자 저장
 
                 # 기존 데이터 확인 (`RGS_PROC_DT` 기준으로 최신 데이터 판단)
-                existing_record = Etc.objects.filter(bill_id=bill_id).order_by("-rgs_proc_dt").first()
+                existing_record = Etc.objects.filter(BILL_ID=BILL_ID).order_by("-RGS_PROC_DT").first()
 
                 # 기존 데이터가 없거나 새로운 데이터가 더 최신이면 업데이트
-                if not existing_record or (rgs_proc_dt > existing_record.rgs_proc_dt):
+                if not existing_record or (RGS_PROC_DT > existing_record.RGS_PROC_DT):
                     Etc.objects.update_or_create(
-                        bill_id=bill_id,
+                        BILL_ID=BILL_ID,
                         defaults={
                             "age": row.get("AGE", ""),
-                            "proc_result_cd": proc_result_cd,
-                            "DETAIL_LINK": link_url,  # 의안 링크 추가
-                            "rgs_proc_dt": rgs_proc_dt  # 의결일 추가
+                            "PROC_RESULT_CD": PROC_RESULT_CD,
+                            "DETAIL_LINK": LINK_URL,  # 의안 링크 추가
+                            "RGS_PROC_DT": RGS_PROC_DT  # 의결일 추가
                         }
                     )
 

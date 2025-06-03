@@ -44,19 +44,20 @@ def fetch_and_save_law():
                     target_fields = ["BILL_ID", "BILL_NO", "BILL_NM", "PROPOSER", "PROC_RESULT_CD", "ANNOUNCE_DT", "LINK_URL", "RGS_PROC_DT"]
 
                     for row in all_data:
-                        bill_data = {field.lower(): row.get(field, "") for field in target_fields}
+                        bill_data = {field: row.get(field, "") for field in target_fields}
+
 
                         # 저장 또는 업데이트
                         Law.objects.update_or_create(
-                            bill_id=bill_data["bill_id"],
+                            BILL_ID=bill_data["BILL_ID"],
                             defaults={
-                                "bill_no": bill_data["bill_no"],
-                                "bill_nm": bill_data["bill_nm"],
-                                "proposer": bill_data["proposer"],
-                                "proc_result_cd": bill_data["proc_result_cd"],
-                                "announce_dt": bill_data["announce_dt"],
-                                "DETAIL_LINK": bill_data["link_url"],  # 의안 링크 저장
-                                "rgs_proc_dt": bill_data["rgs_proc_dt"]  # 의결일자 저장
+                                "BILL_NO": bill_data["BILL_NO"],
+                                "BILL_NM": bill_data["BILL_NM"],
+                                "PROPOSER": bill_data["PROPOSER"],
+                                "PROC_RESULT_CD": bill_data["PROC_RESULT_CD"],
+                                "ANNOUNCE_DT": bill_data["ANNOUNCE_DT"],
+                                "DETAIL_LINK": bill_data["LINK_URL"],  # 의안 링크 저장
+                                "RGS_PROC_DT": bill_data["RGS_PROC_DT"]  # 의결일자 저장
                             }
                         )
 

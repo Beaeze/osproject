@@ -50,18 +50,18 @@ def fetch_and_save_cost():
 
         # 저장 (update_or_create 사용)
         for row in all_data:
-            bill_id = row.get("BILL_ID", "")
-            proc_result_cd = row.get("PROC_RESULT_CD", "")
+            BILL_ID = row.get("BILL_ID", "")
+            PROC_RESULT_CD = row.get("PROC_RESULT_CD", "")
             link_url = row.get("LINK_URL", "")  # 의안 링크
-            rgs_proc_dt = row.get("RGS_PROC_DT", "")  # 의결일자 (올바른 키 사용)
+            RGS_PROC_DT = row.get("RGS_PROC_DT", "")  # 의결일자 (올바른 키 사용)
 
             Cost.objects.update_or_create(
-                bill_id=bill_id,
+                BILL_ID=BILL_ID,
                 defaults={
                     "age": row.get("AGE", ""),
-                    "proc_result_cd": proc_result_cd,
+                    "PROC_RESULT_CD": PROC_RESULT_CD,
                     "DETAIL_LINK": link_url,
-                    "rgs_proc_dt": rgs_proc_dt
+                    "RGS_PROC_DT": RGS_PROC_DT
                 }
             )
 
