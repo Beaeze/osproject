@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'pybo.apps.PyboConfig',
     'legislation.apps.LegislationConfig',
     'attendance.apps.AttendanceConfig',
+    'vote.apps.VoteConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

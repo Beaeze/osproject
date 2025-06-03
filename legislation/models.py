@@ -8,7 +8,7 @@ class ALL(models.Model):
     PROC_RESULT_CD = models.CharField(max_length=20, blank=True)
     PROPOSER = models.CharField(max_length=200, blank=True)
     DETAIL_LINK = models.URLField(blank=True)
-    rgs_proc_dt = models.CharField(max_length=20, null=True, blank=True)  # 의결일
+    RGS_PROC_DT = models.CharField(max_length=20, null=True, blank=True)  # 의결일
 
     def __str__(self):
         return self.BILL_ID
@@ -51,48 +51,48 @@ class CommitteeMember(models.Model):
 
 class Costly(models.Model):
     age = models.CharField(max_length=10)  # 국회 대수
-    bill_id = models.CharField(max_length=100, unique=True)  # 의안 ID
-    proc_result_cd = models.CharField(max_length=50, blank=True)  # 처리 결과 코드
+    BILL_ID = models.CharField(max_length=100, unique=True)  # 의안 ID
+    PROC_RESULT_CD = models.CharField(max_length=50, blank=True)  # 처리 결과 코드
     DETAIL_LINK = models.URLField(blank=True)
-    rgs_proc_dt = models.CharField(max_length=20, null=True, blank=True)  # 의결일
+    RGS_PROC_DT = models.CharField(max_length=20, null=True, blank=True)  # 의결일
 
     def __str__(self):
-        return f"{self.bill_id} - {self.proc_result_cd}"
+        return f"{self.BILL_ID} - {self.PROC_RESULT_CD}"
     
 
 class Cost(models.Model):
     age = models.CharField(max_length=10)  # 국회 대수
-    bill_id = models.CharField(max_length=100, unique=True)  # 의안 ID
-    proc_result_cd = models.CharField(max_length=50, blank=True)  # 처리 결과 코드
+    BILL_ID = models.CharField(max_length=100, unique=True)  # 의안 ID
+    PROC_RESULT_CD = models.CharField(max_length=50, blank=True)  # 처리 결과 코드
     DETAIL_LINK = models.URLField(blank=True)
-    rgs_proc_dt = models.CharField(max_length=20, null=True, blank=True)  # 의결일
+    RGS_PROC_DT = models.CharField(max_length=20, null=True, blank=True)  # 의결일
 
     def __str__(self):
-        return f"{self.bill_id} - {self.proc_result_cd}"
+        return f"{self.BILL_ID} - {self.PROC_RESULT_CD}"
     
 
 class Etc(models.Model):
     age = models.CharField(max_length=10)  # 국회 대수
-    bill_id = models.CharField(max_length=100, unique=True)  # 의안 ID
-    proc_result_cd = models.CharField(max_length=50, blank=True)  # 처리 결과 코드
+    BILL_ID = models.CharField(max_length=100, unique=True)  # 의안 ID
+    PROC_RESULT_CD = models.CharField(max_length=50, blank=True)  # 처리 결과 코드
     DETAIL_LINK = models.URLField(blank=True)
-    rgs_proc_dt = models.CharField(max_length=20, null=True, blank=True)  # 의결일
+    RGS_PROC_DT = models.CharField(max_length=20, null=True, blank=True)  # 의결일
     def __str__(self):
-        return f"{self.bill_id} - {self.proc_result_cd}"
+        return f"{self.BILL_ID} - {self.PROC_RESULT_CD}"
     
 
 class Law(models.Model):
-    bill_id = models.CharField(max_length=100, unique=True)
-    bill_no = models.CharField(max_length=50, blank=True)
-    bill_nm = models.TextField(blank=True)
+    BILL_ID = models.CharField(max_length=100, unique=True)
+    BILL_NO = models.CharField(max_length=50, blank=True)
+    BILL_NM = models.TextField(blank=True)
     proposer = models.CharField(max_length=100, blank=True)
-    proc_result_cd = models.CharField(max_length=50, blank=True)
+    PROC_RESULT_CD = models.CharField(max_length=50, blank=True)
     announce_dt = models.CharField(max_length=20, null=True, blank=True)
     DETAIL_LINK = models.URLField(blank=True)
-    rgs_proc_dt = models.CharField(max_length=20, null=True, blank=True)  # 의결일
+    RGS_PROC_DT = models.CharField(max_length=20, null=True, blank=True)  # 의결일
 
     def __str__(self):
-        return f"{self.bill_nm} ({self.bill_no})"
+        return f"{self.BILL_NM} ({self.BILL_NO})"
     
 
 
