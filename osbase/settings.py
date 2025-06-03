@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'attendance.apps.AttendanceConfig',
     'vote.apps.VoteConfig',
     'performance.apps.PerformanceConfig',
+    'core.apps.CoreConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
