@@ -16,3 +16,19 @@ class Performance(models.Model):
 
     def __str__(self):
         return f"{self.lawmaker.name} - 실적"
+    
+class PartyPerformance(models.Model):
+    party = models.CharField(max_length=100, unique=True)
+    avg_attendance = models.FloatField()
+    avg_invalid_vote_ratio = models.FloatField()
+    avg_vote_match_ratio = models.FloatField()
+    avg_vote_mismatch_ratio = models.FloatField()
+    bill_pass_sum = models.IntegerField()
+    petition_sum = models.IntegerField()
+    petition_pass_sum = models.IntegerField()
+    committee_leader_count = models.IntegerField()
+    member_count = models.IntegerField()
+    weighted_score = models.FloatField()
+
+    def __str__(self):
+        return f"{self.party} - 정당 실적"

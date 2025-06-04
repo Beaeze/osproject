@@ -11,3 +11,5 @@ class PartyPerformanceSerializer(serializers.Serializer):
     avg_score = serializers.FloatField()
     count = serializers.IntegerField()
     weighted_score = serializers.FloatField()
+
+

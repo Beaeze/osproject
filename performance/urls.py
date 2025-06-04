@@ -1,7 +1,8 @@
 from django.urls import path
-from performance.views import get_performance_data, get_party_weighted_performance
+from performance.views import get_performance_data, get_party_weighted_performance, get_party_performance_stats
 
 urlpatterns = [
     path("performance-data/", get_performance_data, name="get_performance_data"),
     path("party-weighted-performance/", get_party_weighted_performance, name="get_party_weighted_performance"),
+    path("party-performance-stats/", get_party_performance_stats, name="get_party_performance_stats"),
 ]
