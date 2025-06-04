@@ -1,9 +1,13 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
 from performance.models import Performance, PartyPerformance
 from legislation.models import Member
 from performance.serializers import PerformanceSerializer, PartyPerformanceSerializer
-import math
+from performance.api_result import calculate_performance_scores  # ✅ 국회의원 실적 업데이트
+from performance.party_stats import calculate_party_performance_scores  # ✅ 정당 실적 업데이트
 
 @api_view(["GET"])
 def get_performance_data(request):
@@ -52,3 +56,27 @@ def get_party_performance_stats(request):
     stats = PartyPerformance.objects.all().order_by("-weighted_score")
     serializer = PartyPerformanceSerializer(stats, many=True)
     return Response({"party_stats": serializer.data})
+
+@csrf_exempt
+@api_view(["POST"])
+def update_weights_and_recalculate(request):
+    """사용자 입력을 반영하여 국회의원 및 정당 실적 업데이트"""
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        # 사용자 입력이 없으면 기본 가중치 사용
+        weights = data if data else {
+            "attendance_weight": 8.0,
+            "bill_passed_weight": 40.0,
+            "petition_proposed_weight": 8.0,
+            "petition_result_weight": 23.0,
+            "committee_weight": 5.0,
+            "adjusted_invalid_vote_weight": 2.0,
+            "vote_match_weight": 7.0,
+            "vote_mismatch_weight": 4.0
+        }
+
+        calculate_performance_scores(weights)  # 국회의원 실적 업데이트
+        calculate_party_performance_scores(weights)  # 정당 실적 업데이트
+
+        return JsonResponse({"message": "✅ 실적 업데이트 완료! (사용자 입력 반영됨)"})
