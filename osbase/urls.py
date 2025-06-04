@@ -24,7 +24,7 @@ urlpatterns = [
     path("performance/", include("performance.urls")),  # 🔥 performance 앱 추가!
     path("legislation/", include("legislation.urls")),  # 🚀 legislation 앱의 API 
     path("vote/", include("vote.urls")),  # 🚀 vote 앱의 API 연결!
-    path("performance/", include("performance.urls")),  # 🚀 Performance 앱 API 연결!
+    path("attendance/", include("attendance.urls")),  # 🚀 attendance 앱 API 연결!
 
 ]
 

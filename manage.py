@@ -3,6 +3,7 @@
 import os
 import sys
 
+sys.path.append("C:/Users/ddong/AppData/Roaming/Python/Python39/site-packages")  # ✅ 슬래시 사용
 
 def main():
     """Run administrative tasks."""
