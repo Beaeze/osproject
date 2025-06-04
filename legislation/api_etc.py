@@ -45,32 +45,42 @@ def fetch_and_save_etc():
             rows = data[api_name][1].get("row", [])
             all_data.extend(rows)
 
-        # 최신 논의된 법안이 리스트의 마지막에 위치하도록 정렬
+        # 최신 논의된 법안이 리스트의 첫 부분에 위치하도록 정렬
         all_data = sorted(all_data, key=lambda x: x.get("RGS_PROC_DT", ""), reverse=True)
 
         # 기존 데이터 삭제 (선택)
         Etc.objects.all().delete()
 
-        # 최신 데이터 기준으로 업데이트
         for row in all_data:
             try:
                 BILL_ID = row.get("BILL_ID", "")
                 PROC_RESULT_CD = row.get("PROC_RESULT_CD", "")
-                LINK_URL = row.get("LINK_URL", "")  # 의안 링크 저장
-                RGS_PROC_DT = row.get("RGS_PROC_DT", "")  # 의결일자 저장
+                LINK_URL = row.get("LINK_URL", "")
+                RGS_PROC_DT = row.get("RGS_PROC_DT", "")
+                BILL_NM = row.get("BILL_NM", "")  # 안건명 추가
 
-                # 기존 데이터 확인 (`RGS_PROC_DT` 기준으로 최신 데이터 판단)
+                if not BILL_ID:
+                    continue  # BILL_ID 없으면 skip
+
                 existing_record = Etc.objects.filter(BILL_ID=BILL_ID).order_by("-RGS_PROC_DT").first()
 
-                # 기존 데이터가 없거나 새로운 데이터가 더 최신이면 업데이트
-                if not existing_record or (RGS_PROC_DT > existing_record.RGS_PROC_DT):
+                # 날짜 비교 함수 (빈 값 처리 포함)
+                def is_newer(date_new, date_old):
+                    if not date_old:
+                        return True
+                    if not date_new:
+                        return False
+                    return date_new > date_old
+
+                if not existing_record or is_newer(RGS_PROC_DT, existing_record.RGS_PROC_DT):
                     Etc.objects.update_or_create(
                         BILL_ID=BILL_ID,
                         defaults={
                             "age": row.get("AGE", ""),
                             "PROC_RESULT_CD": PROC_RESULT_CD,
-                            "DETAIL_LINK": LINK_URL,  # 의안 링크 추가
-                            "RGS_PROC_DT": RGS_PROC_DT  # 의결일 추가
+                            "DETAIL_LINK": LINK_URL,
+                            "RGS_PROC_DT": RGS_PROC_DT,
+                            "BILL_NM": BILL_NM,
                         }
                     )
 

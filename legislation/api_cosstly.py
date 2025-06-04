@@ -54,6 +54,7 @@ def fetch_and_save_costly():
             PROC_RESULT_CD = row.get("PROC_RESULT_CD", "")
             LINK_URL = row.get("LINK_URL", "")  # 의안 링크
             RGS_PROC_DT = row.get("RGS_PROC_DT", "")  # 의결일자 (올바른 키 사용)
+            BILL_NM = row.get("BILL_NAME", "")  # 안건명 추가
 
             Costly.objects.update_or_create(
                 BILL_ID=BILL_ID,
@@ -61,7 +62,8 @@ def fetch_and_save_costly():
                     "age": row.get("AGE", ""),
                     "PROC_RESULT_CD": PROC_RESULT_CD,
                     "DETAIL_LINK": LINK_URL,
-                    "RGS_PROC_DT": RGS_PROC_DT
+                    "RGS_PROC_DT": RGS_PROC_DT,
+                    "BILL_NM": BILL_NM,  # 안건명 저장
                 }
             )
 

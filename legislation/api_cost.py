@@ -53,7 +53,8 @@ def fetch_and_save_cost():
             BILL_ID = row.get("BILL_ID", "")
             PROC_RESULT_CD = row.get("PROC_RESULT_CD", "")
             link_url = row.get("LINK_URL", "")  # 의안 링크
-            RGS_PROC_DT = row.get("RGS_PROC_DT", "")  # 의결일자 (올바른 키 사용)
+            RGS_PROC_DT = row.get("RGS_PROC_DT", "")  # 의결일자
+            BILL_NM = row.get("BILL_NAME", "")  # 안건명 추가
 
             Cost.objects.update_or_create(
                 BILL_ID=BILL_ID,
@@ -61,7 +62,8 @@ def fetch_and_save_cost():
                     "age": row.get("AGE", ""),
                     "PROC_RESULT_CD": PROC_RESULT_CD,
                     "DETAIL_LINK": link_url,
-                    "RGS_PROC_DT": RGS_PROC_DT
+                    "RGS_PROC_DT": RGS_PROC_DT,
+                    "BILL_NM": BILL_NM,  # 안건명 저장
                 }
             )
 

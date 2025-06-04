@@ -38,10 +38,11 @@ def fetch_and_save_all():
                 BILL_ID=row.get("BILL_ID", ""),
                 defaults={
                     "AGE": row.get("AGE", ""),
+                    "BILL_NM": row.get("BILL_NAME", ""),           # 안건명 저장 추가
                     "PROC_RESULT_CD": row.get("PROC_RESULT_CD", ""),
                     "PROPOSER": row.get("PROPOSER", ""),
                     "DETAIL_LINK": row.get("LINK_URL", ""),
-                    "RGS_PROC_DT":row.get("PROC_DT","")
+                    "RGS_PROC_DT": row.get("PROC_DT", "")
                 }
             )
 

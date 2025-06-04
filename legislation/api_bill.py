@@ -59,6 +59,8 @@ def fetch_and_save_bill():
             if not proc_result:  # ✅ NULL 값 방지
                 proc_result = "UNKNOWN"
 
+            bill_nm = row.get("BILL_NAME", "")  # 안건명 추가
+
             try:
                 bill, created = Bill.objects.update_or_create(
                     BILL_ID=bill_id,
@@ -66,6 +68,7 @@ def fetch_and_save_bill():
                         "MAIN_PROPOSER": row.get("RST_PROPOSER", "UNKNOWN"),
                         "CO_PROPOSERS": json.dumps(co_proposers, ensure_ascii=False),  # ✅ UTF-8 인코딩 유지
                         "PROC_RESULT": proc_result,  # ✅ NULL 문제 해결
+                        "BILL_NM": bill_nm,  # 안건명 저장
                     },
                 )
             except Exception as e:

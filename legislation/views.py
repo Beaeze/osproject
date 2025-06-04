@@ -11,6 +11,7 @@ from legislation.serializers import (
     MemberSerializer, PetitionSerializer, PetitionIntroducerSerializer, PhotoSerializer
 )
 
+
 @api_view(["GET"])
 def get_all_data(request):
     """ALL 모델 데이터 반환"""

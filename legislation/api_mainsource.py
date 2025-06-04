@@ -34,18 +34,22 @@ def fetch_and_save_mainsource():
 
         print(f"👨‍💼 총 {len(rows)}명의 국회의원 데이터를 가져왔습니다.")
 
+        api_mona_cd_set = set()  # API에서 받은 MONA_CD 저장용
+
         for row in rows:
-            mona_cd_value = row.get("MONA_CD", "") or ""  # ✅ None일 경우 빈 문자열로 처리
+            mona_cd_value = row.get("MONA_CD", "") or ""
 
             if not mona_cd_value.strip():
                 print(f"❌ `MONA_CD` 값이 비어 있습니다. 해당 데이터는 저장되지 않습니다.")
                 continue
 
-            homepage_value = row.get("HOMEPAGE", "") or ""  # ✅ None이면 빈 문자열 처리
-            homepage_value = homepage_value.strip() if homepage_value else None  # ✅ 빈 값 처리
+            api_mona_cd_set.add(mona_cd_value)
 
-            email_value = row.get("E_MAIL", "") or ""  # ✅ None이면 빈 문자열 처리
-            email_value = email_value.strip() if email_value else None  # ✅ 빈 값 처리
+            homepage_value = row.get("HOMEPAGE", "") or ""
+            homepage_value = homepage_value.strip() if homepage_value else None
+
+            email_value = row.get("E_MAIL", "") or ""
+            email_value = email_value.strip() if email_value else None
 
             Member.objects.update_or_create(
                 mona_cd=mona_cd_value,
@@ -54,12 +58,16 @@ def fetch_and_save_mainsource():
                     "party": row.get("POLY_NM", "") or "",
                     "committees": row.get("CMITS", "") or "",
                     "phone": row.get("TEL_NO", "") or "",
-                    "email": email_value,  # ✅ 안전하게 None 처리
-                    "homepage": homepage_value  # ✅ 안전하게 None 처리
+                    "email": email_value,
+                    "homepage": homepage_value
                 }
             )
 
-        print("🎉 국회의원 정보 저장 완료!")
+        # API에 없는 DB 데이터 삭제
+        deleted_count, _ = Member.objects.exclude(mona_cd__in=api_mona_cd_set).delete()
+        print(f"🗑️ API에 없는 {deleted_count}건의 DB 데이터를 삭제했습니다.")
+
+        print("🎉 국회의원 정보 저장 및 불필요 데이터 삭제 완료!")
 
     except json.JSONDecodeError:
         print("❌ JSON 파싱 실패")
