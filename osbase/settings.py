@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    "corsheaders",
 ]
 
 REST_FRAMEWORK = {
@@ -44,7 +45,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
 ]
+# ✅ 모든 origin 허용 (개발용)
+CORS_ALLOW_ALL_ORIGINS = True  # 또는 CORS_ORIGIN_ALLOW_ALL = True (버전에 따라)
+
+# ✅ 만약 fetch 요청에 쿠키, 인증 정보 등을 포함하는 경우
+CORS_ALLOW_CREDENTIALS = True  # 사용하지 않으면 생략 가능
 
 ROOT_URLCONF = 'osbase.urls'
 
