@@ -58,6 +58,7 @@ class Costly(models.Model):
     PROC_RESULT_CD = models.CharField(max_length=50, blank=True)  # 처리 결과 코드
     DETAIL_LINK = models.URLField(blank=True)
     RGS_PROC_DT = models.CharField(max_length=20, null=True, blank=True)  # 의결일
+    PROPOSER = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return f"{self.BILL_NM} ({self.BILL_ID})"
@@ -70,7 +71,8 @@ class Cost(models.Model):
     PROC_RESULT_CD = models.CharField(max_length=50, blank=True)  # 처리 결과 코드
     DETAIL_LINK = models.URLField(blank=True)
     RGS_PROC_DT = models.CharField(max_length=20, null=True, blank=True)  # 의결일
-
+    PROPOSER = models.CharField(max_length=200, blank=True)
+    
     def __str__(self):
         return f"{self.BILL_NM} ({self.BILL_ID})"
     
@@ -82,6 +84,8 @@ class Etc(models.Model):
     PROC_RESULT_CD = models.CharField(max_length=50, blank=True)  # 처리 결과 코드
     DETAIL_LINK = models.URLField(blank=True)
     RGS_PROC_DT = models.CharField(max_length=20, null=True, blank=True)  # 의결일
+    PROPOSER = models.CharField(max_length=200, blank=True)
+    
     def __str__(self):
         return f"{self.BILL_NM} ({self.BILL_ID})"
     
