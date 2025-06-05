@@ -55,6 +55,7 @@ def fetch_and_save_cost():
             link_url = row.get("LINK_URL", "")  # 의안 링크
             RGS_PROC_DT = row.get("RGS_PROC_DT", "")  # 의결일자
             BILL_NM = row.get("BILL_NAME", "")  # 안건명 추가
+            PROPOSER=row.get("PROPOSER", "")
 
             Cost.objects.update_or_create(
                 BILL_ID=BILL_ID,
@@ -64,6 +65,7 @@ def fetch_and_save_cost():
                     "DETAIL_LINK": link_url,
                     "RGS_PROC_DT": RGS_PROC_DT,
                     "BILL_NM": BILL_NM,  # 안건명 저장
+                    "PROPOSER":PROPOSER,
                 }
             )
 

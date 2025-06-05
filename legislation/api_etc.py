@@ -58,7 +58,7 @@ def fetch_and_save_etc():
                 LINK_URL = row.get("LINK_URL", "")
                 RGS_PROC_DT = row.get("RGS_PROC_DT", "")
                 BILL_NM = row.get("BILL_NM", "")  # 안건명 추가
-
+                PROPOSER=row.get("PROPOSER", "")
                 if not BILL_ID:
                     continue  # BILL_ID 없으면 skip
 
@@ -81,6 +81,7 @@ def fetch_and_save_etc():
                             "DETAIL_LINK": LINK_URL,
                             "RGS_PROC_DT": RGS_PROC_DT,
                             "BILL_NM": BILL_NM,
+                            "PROPOSER":PROPOSER,
                         }
                     )
 
