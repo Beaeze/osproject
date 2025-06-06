@@ -80,3 +80,45 @@ def update_weights_and_recalculate(request):
         calculate_party_performance_scores(weights)  # 정당 실적 업데이트
 
         return JsonResponse({"message": "✅ 실적 업데이트 완료! (사용자 입력 반영됨)"})
+    
+
+@api_view(["GET"])
+def get_lawmaker_performance_by_party(request):
+    """
+    정당별 국회의원 실적 순위 반환 API
+    - /api/performance/by-party?party=정당명&order=desc&limit=10
+    - 결과에 rank(등수)도 포함됨
+    """
+    party = request.GET.get("party")
+    order = request.GET.get("order", "desc")
+    limit = int(request.GET.get("limit", 10))
+
+    if not party:
+        return Response({"error": "⚠️ 'party' 파라미터가 필요합니다."}, status=400)
+
+    if order not in ("asc", "desc"):
+        return Response({"error": "⚠️ 정렬 방식은 'asc' 또는 'desc' 중 하나여야 합니다."}, status=400)
+
+    order_by = "total_score" if order == "asc" else "-total_score"
+
+    # 해당 정당 소속 의원 중 현재 의원만 필터링
+    current_lawmaker_names = Member.objects.filter(party=party).values_list("name", flat=True)
+
+    performances = Performance.objects.filter(
+        lawmaker__name__in=current_lawmaker_names
+    ).order_by(order_by)[:limit]
+
+    if not performances.exists():
+        return Response({"message": f"❌ '{party}' 소속 국회의원의 실적 데이터가 없습니다."}, status=404)
+
+    serializer = PerformanceSerializer(performances, many=True)
+    serialized_data = serializer.data
+
+    # 등수(rank) 필드 추가
+    for idx, item in enumerate(serialized_data, start=1):
+        item["rank"] = idx
+
+    return Response({
+        "party": party,
+        "ranking": serialized_data
+    })
