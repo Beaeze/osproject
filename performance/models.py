@@ -58,6 +58,6 @@ class PartyPerformance(models.Model):
 
     # 최종 실적 점수 (가중 평균)
     weighted_score = models.FloatField(default=0.0)
-
+    avg_total_score = models.FloatField(default=0.0)  # ✅ 국회의원 실적 평균
     def __str__(self):
         return f"{self.party} - 정당 실적"

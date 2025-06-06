@@ -24,7 +24,7 @@ def calculate_party_performance_scores(weights=None):
     for party_obj in party_stats:
         party_name = party_obj["party"]
 
-        # 🔥 `Performance` 모델을 활용하여 정당별 국회의원 점수 가져오기
+        # 🔥 Performance 모델을 활용하여 정당별 국회의원 점수 가져오기
         performances = Performance.objects.filter(party=party_name)
 
         # 각 요소별 평균 점수 계산
@@ -36,8 +36,9 @@ def calculate_party_performance_scores(weights=None):
         avg_invalid_vote = performances.aggregate(Avg("invalid_vote_ratio"))["invalid_vote_ratio__avg"] or 0.0
         avg_vote_match = performances.aggregate(Avg("vote_match_ratio"))["vote_match_ratio__avg"] or 0.0
         avg_vote_mismatch = performances.aggregate(Avg("vote_mismatch_ratio"))["vote_mismatch_ratio__avg"] or 0.0
+        avg_total_score = performances.aggregate(Avg("total_score"))["total_score__avg"] or 0.0  # ✅ 총 실적 평균
 
-        # 🔥 정당 실적 종합 점수(`weighted_score`) 계산 (국회의원 실적 가중치 적용)
+        # 🔥 정당 실적 종합 점수 계산 (국회의원 실적 가중치 적용)
         weighted_score = round(
             avg_attendance * (final_weights["attendance_weight"] / 100) +
             avg_bill_pass * (final_weights["bill_passed_weight"] / 100) +
@@ -49,7 +50,7 @@ def calculate_party_performance_scores(weights=None):
             avg_vote_mismatch * (final_weights["vote_mismatch_weight"] / 100), 2
         )
 
-        # 🔥 위원장 및 간사 수 (`CommitteeMember` 모델 활용)
+        # 🔥 위원장 및 간사 수
         committee_leader_count = CommitteeMember.objects.filter(
             POLY_NM=party_name,
             JOB_RES_NM="위원장"
@@ -77,7 +78,8 @@ def calculate_party_performance_scores(weights=None):
                 "committee_leader_count": committee_leader_count,
                 "committee_secretary_count": committee_secretary_count,
                 "member_count": member_count,
-                "weighted_score": weighted_score
+                "weighted_score": weighted_score,
+                "avg_total_score": round(avg_total_score, 2),  # ✅ 추가된 필드
             }
         )
 
