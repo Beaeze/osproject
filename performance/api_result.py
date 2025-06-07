@@ -18,10 +18,6 @@ DEFAULT_WEIGHTS = {
     "max_invalid_vote_score": 4.0,
 }
 
-# 전체 기준값
-TOTAL_BILLS = Petition.objects.values("BILL_ID").distinct().count()
-TOTAL_PETITIONS = PetitionIntroducer.objects.values("petition_id").distinct().count()
-TOTAL_PASSED_PETITIONS = Petition.objects.filter(PROC_RESULT_CD__in=GAEOL_LIST).values("BILL_ID").distinct().count()
 
 def load_party_info():
     return {m.name: m.party for m in Member.objects.all()}
@@ -69,6 +65,10 @@ def calculate_performance_scores(**weights):
     final_weights = {**DEFAULT_WEIGHTS, **weights}
     party_map = load_party_info()
     all_lawmakers = Lawmaker.objects.all()
+    # 전체 기준값
+    TOTAL_BILLS = Petition.objects.values("BILL_ID").distinct().count()
+    TOTAL_PETITIONS = PetitionIntroducer.objects.values("petition_id").distinct().count()
+    TOTAL_PASSED_PETITIONS = Petition.objects.filter(PROC_RESULT_CD__in=GAEOL_LIST).values("BILL_ID").distinct().count()
 
     raw_scores = {}
 
