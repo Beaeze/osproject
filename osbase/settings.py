@@ -52,7 +52,7 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = True  # 또는 CORS_ORIGIN_ALLOW_ALL = True (버전에 따라)
 
 # ✅ 만약 fetch 요청에 쿠키, 인증 정보 등을 포함하는 경우
-CORS_ALLOW_CREDENTIALS = True  # 사용하지 않으면 생략 가능
+CORS_ALLOW_CREDENTIALS = False  # 사용하지 않으면 생략 가능
 
 ROOT_URLCONF = 'osbase.urls'
 

@@ -6,7 +6,7 @@ class Performance(models.Model):
     party = models.CharField(max_length=100) #정당
     total_score = models.FloatField() #총 실적
     attendance_score = models.FloatField() #출석
-    bill_pass_score = models.FloatField() #가결된 법률안
+    bill_pass_count = models.FloatField() #가결된 법률안
     petition_score = models.IntegerField() #청원제시
     petition_result_score = models.IntegerField() #청원 가결
     committee_score = models.IntegerField() #위원회
