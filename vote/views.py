@@ -3,8 +3,8 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from vote.models import Lawmaker, BillId, Vote, LawmakerVoteSummary,BillVoteByParty
-from vote.serializers import LawmakerSerializer, BillIdSerializer, VoteSerializer, LawmakerVoteSummarySerializer,BillVoteByPartySerializer
+from vote.models import Lawmaker, BillId, Vote, LawmakerVoteSummary,BillVoteByParty,BillVoteSummary
+from vote.serializers import LawmakerSerializer, BillIdSerializer, VoteSerializer, LawmakerVoteSummarySerializer,BillVoteByPartySerializer,BillVoteSummarySerializer
 
 @api_view(["GET"])
 def get_lawmaker_data(request):
@@ -39,4 +39,11 @@ def get_bill_vote_by_party_data(request):
     """BillVoteByParty 모델 데이터 반환"""
     records = BillVoteByParty.objects.all()
     serializer = BillVoteByPartySerializer(records, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def get_bill_vote_summaries(request):
+    summaries = BillVoteSummary.objects.all().order_by('-participation_rate')  # 참여율 높은 순
+    serializer = BillVoteSummarySerializer(summaries, many=True)
     return Response(serializer.data)

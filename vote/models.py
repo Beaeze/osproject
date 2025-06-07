@@ -58,3 +58,18 @@ class BillVoteByParty(models.Model):
 
     class Meta:
         unique_together = ('bill', 'party')
+
+
+class BillVoteSummary(models.Model):
+    bill = models.OneToOneField(BillId, on_delete=models.CASCADE)
+
+    total_votes = models.PositiveIntegerField(default=0)  # 투표 참여 인원 수
+    participation_rate = models.FloatField(default=0.0)  # 투표율 (0~100)
+
+    agree_count = models.PositiveIntegerField(default=0) #찬성
+    oppose_count = models.PositiveIntegerField(default=0) #반대
+    abstain_count = models.PositiveIntegerField(default=0) #기권
+    absent_count = models.PositiveIntegerField(default=0) #불참
+
+    def __str__(self):
+        return f"{self.bill.bill_id} - 투표 요약"
