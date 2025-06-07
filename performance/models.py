@@ -13,7 +13,13 @@ class Performance(models.Model):
     invalid_vote_ratio = models.FloatField() #기권및 무효
     vote_match_ratio = models.FloatField() #투표와 결과가 맞는경우
     vote_mismatch_ratio = models.FloatField() #투표와 결과가 다른경우
+    committee_leader_count = models.IntegerField(default=0)  # 위원장 수
+    committee_secretary_count = models.IntegerField(default=0)  # 간사 수
 
+    # 새로 추가된 필드
+    committee_leader_score = models.FloatField(default=0.0)  # 위원장 점수 (leader_count * 5)
+    committee_secretary_score = models.FloatField(default=0.0)  # 간사 점수 (secretary_count * 3)
+    
     def __str__(self):
         return f"{self.lawmaker.name} - 실적"
     
