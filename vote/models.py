@@ -1,8 +1,9 @@
 from django.db import models
+from legislation.models import Member
 
 class Lawmaker(models.Model):
     name = models.CharField(max_length=100, unique=True)  #의원이름
-
+    member = models.OneToOneField(Member, null=True, blank=True, on_delete=models.SET_NULL)
     def __str__(self):
         return self.name
 
@@ -43,3 +44,17 @@ class LawmakerVoteSummary(models.Model):
 
     def __str__(self):
         return f"{self.lawmaker.name} - 요약"
+
+
+
+class BillVoteByParty(models.Model):
+    bill = models.ForeignKey('vote.BillId', on_delete=models.CASCADE)
+    party = models.CharField(max_length=50)
+
+    agree = models.PositiveIntegerField(default=0)
+    oppose = models.PositiveIntegerField(default=0)
+    abstain = models.PositiveIntegerField(default=0)
+    absent = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('bill', 'party')
