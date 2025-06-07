@@ -65,5 +65,15 @@ class PartyPerformance(models.Model):
     # 최종 실적 점수 (가중 평균)
     weighted_score = models.FloatField(default=0.0) #가중치 반영 실적
     avg_total_score = models.FloatField(default=0.0)  # ✅ 국회의원 실적 평균
+
+    # 기여도 퍼센트
+    attendance_pct = models.FloatField(default=0.0)
+    bill_pass_pct = models.FloatField(default=0.0)
+    petition_pct = models.FloatField(default=0.0)
+    petition_result_pct = models.FloatField(default=0.0)
+    vote_match_pct = models.FloatField(default=0.0)
+    vote_mismatch_pct = models.FloatField(default=0.0)
+    invalid_vote_pct = models.FloatField(default=0.0)
+    
     def __str__(self):
         return f"{self.party} - 정당 실적"
