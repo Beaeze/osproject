@@ -19,7 +19,6 @@ PENALTY_RATIO = 0.5
 
 def calculate_party_performance_scores(weights=None):
     final_weights = weights if weights else DEFAULT_WEIGHTS
-
     party_stats = Member.objects.values("party").distinct()
 
     for party_obj in party_stats:
@@ -31,7 +30,7 @@ def calculate_party_performance_scores(weights=None):
             continue
 
         total_attendance = performances.aggregate(Sum("attendance_score"))["attendance_score__sum"] or 0.0
-        total_bill_pass = performances.aggregate(Sum("bill_pass_score"))["bill_pass_score__sum"] or 0.0
+        total_bill_pass = performances.aggregate(Sum("bill_pass_count"))["bill_pass_count__sum"] or 0.0
         total_petition = performances.aggregate(Sum("petition_score"))["petition_score__sum"] or 0.0
         total_petition_result = performances.aggregate(Sum("petition_result_score"))["petition_result_score__sum"] or 0.0
         total_committee_leader = performances.aggregate(Sum("committee_leader_score"))["committee_leader_score__sum"] or 0.0
@@ -47,7 +46,7 @@ def calculate_party_performance_scores(weights=None):
         normalized_invalid_score = 1.0 - (total_invalid_vote / (member_count * max_invalid_ratio))
         normalized_invalid_score = max(0.0, normalized_invalid_score)
 
-        # 로그 변환만 적용
+        # 로그 변환 점수 계산
         att_score = np.log(total_attendance + 1) * (final_weights["attendance_weight"] / 100)
         bill_pass_score = np.log(total_bill_pass + 1) * (final_weights["bill_passed_weight"] / 100)
         petition_score = np.log(total_petition + 1) * (final_weights["petition_proposed_weight"] / 100)
@@ -58,52 +57,34 @@ def calculate_party_performance_scores(weights=None):
         vote_mismatch_score = np.log(total_vote_mismatch + 1) * (final_weights["vote_mismatch_weight"] / 100)
         invalid_vote_score = np.log(normalized_invalid_score + 1) * (final_weights["adjusted_invalid_vote_weight"] / 100)
 
-        weighted_score = round(
-            att_score + bill_pass_score + petition_score + petition_result_score +
-            committee_leader_score + committee_secretary_score +
-            vote_match_score + vote_mismatch_score + invalid_vote_score,
-            2
-        )
+        score_items = [
+            att_score,
+            bill_pass_score,
+            petition_score,
+            petition_result_score,
+            committee_leader_score,
+            committee_secretary_score,
+            vote_match_score,
+            vote_mismatch_score,
+            invalid_vote_score,
+        ]
+
+        score_total = sum(score_items)
 
         if member_count < MIN_MEMBER_THRESHOLD:
             penalty_factor = PENALTY_RATIO
         else:
             penalty_factor = 1.0
 
-        weighted_score *= penalty_factor
-        weighted_score = round(weighted_score, 2)
+        weighted_score = round(score_total * penalty_factor, 2)
 
-        def pct_ratio(val):
-            if weighted_score == 0:
-                return 0.0
-            return (val / weighted_score) * 100
-
-        # 비중 소숫점 유지하며 계산
-        attendance_pct = pct_ratio(att_score)
-        bill_pass_pct = pct_ratio(bill_pass_score)
-        petition_pct = pct_ratio(petition_score)
-        petition_result_pct = pct_ratio(petition_result_score)
-        committee_leader_pct = pct_ratio(committee_leader_score)
-        committee_secretary_pct = pct_ratio(committee_secretary_score)
-        vote_match_pct = pct_ratio(vote_match_score)
-        vote_mismatch_pct = pct_ratio(vote_mismatch_score)
-        invalid_vote_pct = pct_ratio(invalid_vote_score)
-
-        # 소수점 반올림은 마지막에 적용하고 총합이 100이 되도록 보정
-        pct_list = [
-            attendance_pct,
-            bill_pass_pct,
-            petition_pct,
-            petition_result_pct,
-            committee_leader_pct,
-            committee_secretary_pct,
-            vote_match_pct,
-            vote_mismatch_pct,
-            invalid_vote_pct,
-        ]
-        pct_rounded = [round(p, 2) for p in pct_list]
-        diff = round(100.0 - sum(pct_rounded), 2)
-        pct_rounded[-1] += diff  # invalid_vote_pct에 보정 적용
+        # 비중(%): 점수 합 기준으로 비율 계산 → 항상 0 이상 & 합이 100%
+        if score_total > 0:
+            pct_list = [round(s / score_total * 100, 2) for s in score_items]
+            diff = round(100.0 - sum(pct_list), 2)
+            pct_list[-1] += diff  # 마지막 항목에 보정
+        else:
+            pct_list = [0.0] * len(score_items)
 
         (
             attendance_pct,
@@ -115,7 +96,7 @@ def calculate_party_performance_scores(weights=None):
             vote_match_pct,
             vote_mismatch_pct,
             invalid_vote_pct,
-        ) = pct_rounded
+        ) = pct_list
 
         committee_leader_count = CommitteeMember.objects.filter(
             POLY_NM=party_name, JOB_RES_NM="위원장"
