@@ -3,12 +3,14 @@ from django.db.models import Sum, Max
 from performance.models import PartyPerformance, Performance
 from legislation.models import CommitteeMember, Member
 
+# 기본 가중치를 간사와 위원장으로 분리
 DEFAULT_WEIGHTS = {
     "attendance_weight": 8.0,
     "bill_passed_weight": 40.0,
     "petition_proposed_weight": 8.0,
     "petition_result_weight": 23.0,
-    "committee_weight": 5.0,
+    "chairman_weight": 5.0,      # 위원장 가중치
+    "secretary_weight": 3.0,   # 간사 가중치 (기존 5.0에서 분리)
     "adjusted_invalid_vote_weight": 2.0,
     "vote_match_weight": 7.0,
     "vote_mismatch_weight": 4.0,
@@ -46,13 +48,13 @@ def calculate_party_performance_scores(weights=None):
         normalized_invalid_score = 1.0 - (total_invalid_vote / (member_count * max_invalid_ratio))
         normalized_invalid_score = max(0.0, normalized_invalid_score)
 
-        # 로그 변환 점수 계산
+        # 로그 변환 점수 계산 - 간사, 위원장 가중치 분리 적용
         att_score = np.log(total_attendance + 1) * (final_weights["attendance_weight"] / 100)
         bill_pass_score = np.log(total_bill_pass + 1) * (final_weights["bill_passed_weight"] / 100)
         petition_score = np.log(total_petition + 1) * (final_weights["petition_proposed_weight"] / 100)
         petition_result_score = np.log(total_petition_result + 1) * (final_weights["petition_result_weight"] / 100)
-        committee_leader_score = np.log(total_committee_leader + 1) * (final_weights["committee_weight"] / 100)
-        committee_secretary_score = np.log(total_committee_secretary + 1) * (final_weights["committee_weight"] / 100)
+        committee_leader_score = np.log(total_committee_leader + 1) * (final_weights["chairman_weight"] / 100)
+        committee_secretary_score = np.log(total_committee_secretary + 1) * (final_weights["secretary_weight"] / 100)
         vote_match_score = np.log(total_vote_match + 1) * (final_weights["vote_match_weight"] / 100)
         vote_mismatch_score = np.log(total_vote_mismatch + 1) * (final_weights["vote_mismatch_weight"] / 100)
         invalid_vote_score = np.log(normalized_invalid_score + 1) * (final_weights["adjusted_invalid_vote_weight"] / 100)
@@ -98,12 +100,19 @@ def calculate_party_performance_scores(weights=None):
             invalid_vote_pct,
         ) = pct_list
 
-        committee_leader_count = CommitteeMember.objects.filter(
+        # 위원장 / 간사 중복 제외 처리
+        committee_leader_members = CommitteeMember.objects.filter(
             POLY_NM=party_name, JOB_RES_NM="위원장"
-        ).count()
-        committee_secretary_count = CommitteeMember.objects.filter(
+        ).values_list("HG_NM", flat=True).distinct()
+
+        committee_secretary_members = CommitteeMember.objects.filter(
             POLY_NM=party_name, JOB_RES_NM="간사"
-        ).count()
+        ).values_list("HG_NM", flat=True).distinct()
+
+        committee_secretary_members = [m for m in committee_secretary_members if m not in committee_leader_members]
+
+        committee_leader_count = len(committee_leader_members)
+        committee_secretary_count = len(committee_secretary_members)
 
         avg_total_score = performances.aggregate(Sum("total_score"))["total_score__sum"] or 0.0
         avg_total_score /= member_count

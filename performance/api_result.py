@@ -14,7 +14,8 @@ DEFAULT_WEIGHTS = {
     "bill_passed_weight": 40.0,
     "petition_proposed_weight": 8.0,
     "petition_result_weight": 23.0,
-    "committee_weight": 5.0,
+    "chairman_weight": 5.0,   # 위원장 가중치 (예: 3점)
+    "secretary_weight": 2.0,  # 간사 가중치 (예: 2점)
     "adjusted_invalid_vote_weight": 2.0,
     "vote_match_weight": 7.0,
     "vote_mismatch_weight": 4.0,
@@ -65,12 +66,7 @@ def get_petition_pass_count(name):
 def get_committee_score(name):
     leader_count = CommitteeMember.objects.filter(HG_NM=name, JOB_RES_NM="위원장").count()
     secretary_count = CommitteeMember.objects.filter(HG_NM=name, JOB_RES_NM="간사").count()
-    # 위원장과 간사 둘 다면 최대 5점으로 동일 처리
-    if leader_count > 0 and secretary_count > 0:
-        score = 5
-    else:
-        score = 5 * leader_count + 3 * secretary_count
-    return score, leader_count, secretary_count
+    return leader_count, secretary_count
 
 def get_bill_pass_count(name):
     bc = Bill_count.objects.filter(proposer=name).first()
@@ -91,7 +87,6 @@ def calculate_performance_scores(**weights):
     party_map = load_party_info()
     all_lawmakers = Lawmaker.objects.all()
 
-    # Petition 관련 총 수 집계
     TOTAL_PETITIONS = PetitionIntroducer.objects.values("petition_id").distinct().count()
     TOTAL_PASSED_PETITIONS = Petition.objects.filter(PROC_RESULT_CD__in=GAEOL_LIST).values("BILL_ID").distinct().count()
 
@@ -116,17 +111,23 @@ def calculate_performance_scores(**weights):
         petition_ratio = (petition_count / TOTAL_PETITIONS) if TOTAL_PETITIONS > 0 else 0
         petition_pass_ratio = (petition_pass_count / TOTAL_PASSED_PETITIONS) if TOTAL_PASSED_PETITIONS > 0 else 0
 
-        committee_score, leader_count, secretary_count = get_committee_score(name)
+        leader_count, secretary_count = get_committee_score(name)
+
+        # 위원장과 간사 점수 조정 - 위원장 있으면 간사 점수 제외
+        if leader_count > 0:
+            committee_score = final_weights["chairman_weight"]
+        else:
+            committee_score = min(secretary_count, 1) * final_weights["secretary_weight"]
 
         total_score = (
             (attendance / 100) * final_weights["attendance_weight"] +
             bill_ratio * final_weights["bill_passed_weight"] +
             petition_ratio * final_weights["petition_proposed_weight"] +
             petition_pass_ratio * final_weights["petition_result_weight"] +
-            (committee_score / 5) * final_weights["committee_weight"] +  # 5점 만점 기준 정규화
+            committee_score +
             (adjusted_invalid_score / final_weights["max_invalid_vote_score"]) * final_weights["adjusted_invalid_vote_weight"] +
             (vote_match / 100) * final_weights["vote_match_weight"] +
-            ((100 - vote_mismatch) / 100) * final_weights["vote_mismatch_weight"]  # 불일치 비율은 낮을수록 점수 높음
+            ((100 - vote_mismatch) / 100) * final_weights["vote_mismatch_weight"]
         )
 
         raw_scores[name] = total_score
@@ -135,7 +136,7 @@ def calculate_performance_scores(**weights):
             lawmaker=lw,
             defaults={
                 "party": party_map.get(name, "무소속"),
-                "total_score": 0.0,  # 나중에 정규화 점수로 업데이트
+                "total_score": 0.0,
                 "attendance_score": attendance,
                 "bill_pass_count": bill_pass_count,
                 "bill_total": bill_total,

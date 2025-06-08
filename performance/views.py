@@ -62,21 +62,32 @@ def get_party_performance_stats(request):
 def update_weights_and_recalculate(request):
     """사용자 입력을 반영하여 국회의원 및 정당 실적 업데이트"""
     if request.method == "POST":
-        data = json.loads(request.body)
+        data = request.data  # DRF에서는 request.data가 JSON 파싱된 상태
 
-        # 사용자 입력이 없으면 기본 가중치 사용
-        weights = data if data else {
+        # 기본 가중치
+        default_weights = {
             "attendance_weight": 8.0,
             "bill_passed_weight": 40.0,
             "petition_proposed_weight": 8.0,
             "petition_result_weight": 23.0,
-            "committee_weight": 5.0,
+            "chairman_weight": 5.0,
+            "secretary_weight": 3.0,
             "adjusted_invalid_vote_weight": 2.0,
             "vote_match_weight": 7.0,
-            "vote_mismatch_weight": 4.0
+            "vote_mismatch_weight": 4.0,
         }
 
-        calculate_performance_scores(weights)  # 국회의원 실적 업데이트
+        # 클라이언트가 committee_weight만 보냈을 경우 분배 처리
+        if data and "committee_weight" in data:
+            committee_weight = data.pop("committee_weight")
+            # 예: 위원장 60%, 간사 40%로 분배 (원하는 비율로 조정 가능)
+            data["chairman_weight"] = committee_weight * 0.6
+            data["secretary_weight"] = committee_weight * 0.4
+
+        # weights = 클라이언트 입력값(있으면) + 기본값 보완
+        weights = {**default_weights, **(data or {})}
+
+        calculate_performance_scores(weights)      # 국회의원 실적 업데이트
         calculate_party_performance_scores(weights)  # 정당 실적 업데이트
 
         return JsonResponse({"message": "✅ 실적 업데이트 완료! (사용자 입력 반영됨)"})
